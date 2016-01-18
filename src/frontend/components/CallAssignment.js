@@ -4,7 +4,6 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton} from 'material-ui';
 import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
-import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
@@ -12,6 +11,12 @@ import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
 import MutationHandler from './MutationHandler';
+
+const SurveyRenderers = {
+  'BSDSurvey': require('./survey-renderers/BSDSurvey'),
+  'PhonebankRSVPSurvey': require('./survey-renderers/PhonebankRSVPSurvey'),
+  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey')
+}
 
 class CallAssignment extends React.Component {
   styles = {
@@ -135,9 +140,40 @@ class CallAssignment extends React.Component {
     return name === '' ? 'Unknown name' : name
   }
 
+  generateEventsInfoEmailLink() {
+    const userFirstName = this.props.currentUser.firstName;
+    const interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    const name = (interviewee.firstName) ? interviewee.firstName : this.intervieweeName();
+    const email = interviewee.email;
+    const zip = interviewee.address.zip;
+    const subject = escape('Bernie Phone Call Followup');
+    const message = escape(
+`Hi ${name},
+
+You asked me for more information about upcoming events in your area. You can view and RSVP to campaign events here:
+http://map.berniesanders.com/#zipcode=${zip}&distance=50
+
+We really appreciate your time! If you're interested in getting involved further, please feel free to sign up at https://berniesanders.com/phonebank.
+
+Thanks,
+${userFirstName}`
+    );
+
+    return `mailto:${email}?subject=${subject}&body=${message}`
+  }
+
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
+    let localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
+
+    let lastCalled = () => {
+      if (interviewee.lastCalled) {
+        return moment(interviewee.lastCalled).utcOffset(interviewee.address.localUTCOffset).fromNow()
+      } else {
+        return 'never'
+      }
+    }
 
     let sideBar = (
       <div>
@@ -162,7 +198,9 @@ class CallAssignment extends React.Component {
     let content = (
       <div style={BernieText.default}>
         Location: {location}<br />
-        Local Time: {moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')}<br />
+        Local Time: {localTime}<br />
+        Last called: {lastCalled()}<br />
+        Email: <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a>
       </div>
     )
 
@@ -229,6 +267,19 @@ class CallAssignment extends React.Component {
   }
 
   render() {
+    let endDate = this.props.callAssignment.endDate
+
+    if (endDate !== null && moment(endDate).isBefore(moment().add(1, 'days')))
+      return (
+        <div style={{
+          marginTop: 40,
+          marginLeft: 40
+        }}>
+          <div style={BernieText.default}>
+            This call assignment is done!
+          </div>
+        </div>
+      )
     if (this.props.currentUser.intervieweeForCallAssignment === null)
       return (
         <div style={{
@@ -244,13 +295,23 @@ class CallAssignment extends React.Component {
         </div>
       )
 
+    let Survey = SurveyRenderers[this.props.callAssignment.renderer];
+
     let survey = (
       <div style={{
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <SurveyRenderer
+        <div style={{
+            ...BernieText.title,
+            fontSize: '1.8em',
+            color: BernieColors.lightBlue
+          }}>
+          Call Script
+        </div>
+        <Survey
           ref='survey'
+          callAssignment={this.props.callAssignment}
           survey={this.props.callAssignment.survey}
           interviewee={this.props.currentUser.intervieweeForCallAssignment}
           currentUser={this.props.currentUser}
@@ -340,16 +401,20 @@ export default Relay.createContainer(CallAssignment, {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
         id
+        endDate
         name
         instructions
         survey {
-          ${SurveyRenderer.getFragment('survey')}
+          ${SurveyRenderers.BSDSurvey.getFragment('survey')}
         }
+        renderer
+        ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('callAssignment')}
       }
     `,
     currentUser: () => Relay.QL`
       fragment on User {
         id
+        firstName
         allCallsMade:callsMade(forAssignmentId:$id)
         completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
         intervieweeForCallAssignment(callAssignmentId:$id) {
@@ -366,6 +431,7 @@ export default Relay.createContainer(CallAssignment, {
           occupation
           phone
           email
+          lastCalled
           address {
             city
             state
@@ -374,9 +440,13 @@ export default Relay.createContainer(CallAssignment, {
             latitude
             longitude
           }
-          ${SurveyRenderer.getFragment('interviewee')}
+          ${SurveyRenderers.BSDSurvey.getFragment('interviewee')}
+          ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('interviewee')}
+          ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('interviewee')}
         }
-        ${SurveyRenderer.getFragment('currentUser')}
+        ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.BSDSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('currentUser')}
       }
     `
   }

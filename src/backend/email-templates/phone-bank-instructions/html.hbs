@@ -1,11 +1,16 @@
-{{> header }}
-
 <p>
   Dear Bernie Volunteer,
 
   <br/><br/>
 
   Thank you so much for volunteering to host a phone bank event for Bernie. You are one of the volunteers at the forefront of the political revolution – and that's why we want to help you get ready for your phone bank event!
+
+  <br/><br/>
+
+  Here is a link to view the event:
+  {{#each eventIds}}
+    <a href="https://go.berniesanders.com/page/event/detail/{{this}}">go.berniesanders.com/page/event/detail/{{this}}</a><br/>
+  {{/each}}
 </p>
 
 Here's what you need to do to get ready:
@@ -70,5 +75,3 @@ Your username on berniesanders.com is <b>{{user.email}}</b>
 Bernie 2016
 <br>
 <a href="mailto:help@berniesanders.com">help@berniesanders.com</a>
-
-{{> footer email=user.email }}

@@ -8,8 +8,10 @@ import qs from 'querystring';
 import log from './log';
 import moment from 'moment-timezone';
 import knex from './data/knex';
+import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
+const inDevEnv = (process.env.NODE_ENV === 'development')
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -285,8 +287,8 @@ export default class BSD {
     return response
   }
 
-  async createConstituent(email) {
-    let params = '<?xml version="1.0" encoding="utf-8"?><api><cons><cons_email><email>' + email + '</email></cons_email></cons></api>';
+  async createConstituent(email, firstName, lastName) {
+    const params = `<?xml version="1.0" encoding="utf-8"?><api><cons><firstname>${firstName}</firstname><lastname>${lastName}</lastname><cons_email><email>${email}</email></cons_email></cons></api>`;
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
     response = await parseStringPromise(response);
 
@@ -441,8 +443,10 @@ export default class BSD {
       else if (apiKeys.indexOf(key) !== -1)
         inputs[key] = event[key]
     })
-    if (Object.keys(eventDate).length > 0)
+    if (Object.keys(eventDate).length > 0) {
+      eventDate['event_id'] = event.event_id
       inputs['days'] = [eventDate]
+    }
     return inputs
   }
 
@@ -452,17 +456,27 @@ export default class BSD {
       ...updatedValues,
       ...{event_id_obfuscated, event_type_id, creator_cons_id}
     }
+    
+    updatedValues.description = htmlToText.fromString(updatedValues.description)
+
     let inputs = this.apiInputsFromEvent(updatedValues)
     // BSD API gets mad if we send this in
     delete inputs['event_id']
-    let response = await this.sendDataInBody('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
+    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
     if (response.validation_errors) {
       throw new Error(JSON.stringify(response.validation_errors));
     }
     return response
   }
 
-  async createEvents(cons_id, form, event_types, callback) {
+  async createEvents(cons_id, form, event_types, batchEventLimit=10) {
+    if (inDevEnv)
+      form['event_type_id'] = '1'
+
+    if (form['event_dates'].length > batchEventLimit){
+      return {status: 'failure', errors: {'Number of Events': [`You can only create up to ${batchEventLimit} events at a time. ${form['event_dates'].length} events were received.`]}}
+    }
+
     let eventType = null;
     event_types.forEach((type) => {
       if (type.event_type_id == form['event_type_id']){
@@ -471,8 +485,7 @@ export default class BSD {
     })
 
     if (eventType === null){
-      callback('Event type does not exist in BSD');
-      return;
+      return {status: 'failure', errors: {'Event Type': ['Does not exist in BSD']}}
     }
 
     // validations
@@ -483,8 +496,9 @@ export default class BSD {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
         flag_approval: form['flag_approval'],
+        is_official: form['is_official'],
         name: form['name'],
-        description: form['description'],
+        description: htmlToText.fromString(form['description']),
         venue_name: form['venue_name'],
         venue_zip: form['venue_zip'],
         venue_city: form['venue_city'],
@@ -520,22 +534,28 @@ export default class BSD {
       startHour = form['start_time']['h'];
     }
 
-    let eventDates = JSON.parse(form['event_dates']);
-
-    eventDates.forEach(async (newEvent, index, array) => {
+    let newEventIds = [];
+    for (let index = 0; index < form['event_dates'].length; index++){
+      let newEvent = form['event_dates'][index];
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
-      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
-      if (response.validation_errors){
-        callback(response.validation_errors);
-      }
-      else if (response.event_id_obfuscated && index == array.length - 1){
-        // successfully created events
-        callback('success');
-      }
-    });
 
-    return
+      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+
+      if (response.validation_errors){
+        return {status: 'failure', errors: response.validation_errors}
+      }
+      else if (response.event_id_obfuscated){
+        newEventIds.push(response.event_id_obfuscated)
+      };
+    }
+
+    if (newEventIds.length > 0){
+      // successfully created events
+      return {status: 'success', ids : newEventIds}
+    }
+
+    return {status: 'failure', errors: {error: 'No event ids returned.'}}
   }
 
   async requestWrapper(options) {

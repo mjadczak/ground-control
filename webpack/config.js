@@ -11,6 +11,7 @@ if (process.env.NODE_ENV === 'production')
 var config = {
   entry: './src/frontend/app.js',
   module: {
+    noParse: /node_modules\/quill\/dist\/quill\.js/,
     loaders: [
       { test: /\.json$/, loader: 'json'},
       { test: /\.css$/, loader: "style!css" },
@@ -25,10 +26,14 @@ var config = {
   plugins: plugins,
   output: {
     filename: 'app.js',
-    path: './src/frontend/public/assets/js/'},
+    path: './src/frontend/public/assets/js/'
+  }
 }
 
-if (process.env.NODE_ENV === 'development')
-  config['devtool'] = "#inline-source-map"
+if (process.env.NODE_ENV === 'development') {
+  config['devtool'] = "#inline-source-map";
+} else if (process.env.NODE_ENV === 'production') {
+  config['devtool'] = 'source-map';
+}
 
 module.exports = config

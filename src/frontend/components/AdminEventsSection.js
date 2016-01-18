@@ -8,12 +8,20 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import {states} from './data/states'
+import {USTimeZones} from './data/USTimeZones'
 
 import IconMenu from 'material-ui/lib/menus/icon-menu'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
+
+require('fixed-data-table/dist/fixed-data-table.min.css')
+require('./styles/adminEventsSection.css')
+
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+
+const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -49,6 +57,8 @@ class AdminEventsSection extends React.Component {
       previewTabIndex: 0,
       userMessage: '',
       approveOnUpdate: true,
+      deletionConfirmationMessage: null,
+      deletionReasonIndex: null,
       undoAction: function(){console.log('undo')}
     }
 
@@ -134,6 +144,18 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  BooleanCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    }}
+    >
+      {(data[rowIndex]['node'][col]) ? 'true' : 'false'}
+    </Cell>
+  )
+
   NoHTMLCell = ({rowIndex, data, col, ...props}) => {
     let displayString = data[rowIndex]['node'][col];
     return (
@@ -207,129 +229,142 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  ActionCell = ({rowIndex, data, col, ...props}) => (
-    <Cell {...props}>
-    <div style={{position: 'relative', left: '-5px'}}>
-      {/*
-        <IconButton
-        title="preview"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 0);
-        }.bind(this)}
+  EventIdLinkCell = ({rowIndex, data, ...props}) => {
+    let cellStyle = {
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    };
+    let linkStyle={
+      color: BernieColors.darkBlue
+    }
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      linkStyle.color = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props}
+      style={cellStyle}
       >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
-      </IconButton>
-      <IconButton
-        title="view public event"
-        onTouchTap={function(){
-          this._handlePublicEventOpen(rowIndex);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
-      </IconButton>
+        <a href={publicEventsRootUrl + data[rowIndex]['node']['eventIdObfuscated']} style={linkStyle} target="_blank">{data[rowIndex]['node']['eventIdObfuscated']}</a>
+      </Cell>
+    )
+  }
 
-      <IconButton
-        title="edit"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
-      </IconButton>
+  ActionCell = ({rowIndex, data, col, ...props}) => {
+    let cellStyle = {}
+    let iconColor = null
 
-      <IconButton
-        title="duplicate"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
-      </IconButton>
+    if (data[rowIndex]['node'].isOfficial) {
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      iconColor = BernieColors.darkRed
+    }
 
-      */}
-
-      <IconButton
-        title="delete"
-        onTouchTap={() => {
-          this._handleEventDeletion([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.red}>delete</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="approve"
-        onTouchTap={() => {
-          this._handleEventConfirmation([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>event_available</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="email"
-        disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
-        onTouchTap={() => {
-          this._handleEventEmail([rowIndex])
-        }}
+    return (
+      <Cell {...props} style={cellStyle}>
+      <div style={{position: 'relative', left: '-5px'}}>
+        {/*
+          <IconButton
+          title="preview"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 0);
+          }.bind(this)}
         >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>email</FontIcon>
-      </IconButton>
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
+        </IconButton>
+        <IconButton
+          title="view public event"
+          onTouchTap={function(){
+            this._handlePublicEventOpen(rowIndex);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
+        </IconButton>
 
-      {/*
-        IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
-        The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-      */}
-      {/*
-      <IconMenu
-        iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
-        desktop={true}
-        openDirection="bottom-right"
-      >
-        <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-      </IconMenu>
-      */}
+        <IconButton
+          title="edit"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
+        </IconButton>
 
-    </div>
-    </Cell>
-  )
+        <IconButton
+          title="duplicate"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
+        </IconButton>
+
+        */}
+
+        <IconButton
+          title="delete"
+          onTouchTap={() => {
+            this._handleEventDeletion([rowIndex])
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.red}>delete</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="approve"
+          disabled={this.props.relay.variables.filters.flagApproval === false}
+          onTouchTap={() => {
+            this._handleEventConfirmation([rowIndex])
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="email"
+          disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
+          onTouchTap={() => {
+            this._handleEventEmail([rowIndex])
+          }}
+          >
+            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
+        </IconButton>
+
+        {/*
+          IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
+          The plan is to use https://github.com/tajo/react-portal to overcome this limitation
+        */}
+        {/*
+        <IconMenu
+          iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
+          desktop={true}
+          openDirection="bottom-right"
+        >
+          <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+        </IconMenu>
+        */}
+
+      </div>
+      </Cell>
+    )
+  }
 
   renderToolbar() {
-    let filterOptions = [
-      { payload: '0', text: 'Pending Approval' },
-      { payload: '1', text: 'Approved Events' }
-      // { payload: '3', text: 'Past Events' }
+    const approvalFilterOptions = [
+      {value: 1, 'text': 'Pending Approval'},
+      {value: 0, 'text': 'Approved Events'}
     ]
 
-    let filterOptionsIndex = 0
+    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
 
-    filterOptions.forEach( (option, index) => {
-      if (!(option.payload) == this.props.relay.variables.filters.flagApproval) {
-        filterOptionsIndex = index
-      }
-    })
+    const resultLengthOptions = [ 10, 25, 50, 100]
+    const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
-    let resultLengthOptions = [
-       { payload: 10, text: '10 Events' },
-       { payload: 25, text: '25 Events' },
-       { payload: 50, text: '50 Events' },
-       { payload: 100, text: '100 Events' }
-       // { payload: 500, text: '500 Events' },
-    ]
-
-    let resultLengthOptionsIndex = 0
-
-    resultLengthOptions.forEach( (option, index) => {
-      if (option.payload == this.props.relay.variables.numEvents) {
-        resultLengthOptionsIndex = index
-      }
-    })
-
-    this._handleEventRequestLengthChange = (event, selectedIndex, menuItem) => {
+    this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this.props.relay.setVariables({
-        numEvents: menuItem.payload
+        numEvents: value
       })
 
       // Remove selection of rows that are now beyond the view
@@ -337,7 +372,7 @@ class AdminEventsSection extends React.Component {
       let i = currentSelectedRows.length
 
       while (i--) {
-        if (currentSelectedRows[i] >= menuItem.payload) {
+        if (currentSelectedRows[i] >= value) {
           currentSelectedRows.splice(i, 1)
         }
       }
@@ -351,22 +386,21 @@ class AdminEventsSection extends React.Component {
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           <DropDownMenu
-            menuItems={filterOptions}
-            selectedIndex={filterOptionsIndex}
-            onChange={(event, value) => {
-              this._handleRequestFiltersChange({flagApproval: !(value)});
+            value={this.props.relay.variables.filters.flagApproval ? 1 : 0}
+            onChange={(event, index, value) => {
+              this._handleRequestFiltersChange({flagApproval: (value == 1)});
             }}
-            menuItemStyle={BernieText.menuItem}
-            style={{marginRight: '0'}}
-          />
+          >
+            {approvalFilterMenuItems}
+          </DropDownMenu>
           <DropDownMenu
-            menuItems={resultLengthOptions}
-            selectedIndex={resultLengthOptionsIndex}
-            menuItemStyle={BernieText.menuItem}
+            value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
-          />
+          >
+            {resultLengthMenuItems}
+          </DropDownMenu>
           {/*IconMenus are just broken right now
           <IconMenu
             iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
@@ -440,7 +474,7 @@ class AdminEventsSection extends React.Component {
             label="Approve Selected"
             style={{marginLeft: 0}}
             secondary={true}
-            disabled={(this.state.selectedRows.length == 0)}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.filters.flagApproval === false)}
             onTouchTap={() => {
           this._handleEventConfirmation(this.state.selectedRows);
         }}
@@ -455,54 +489,164 @@ class AdminEventsSection extends React.Component {
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
+    let deleteMsg = this.state.deletionConfirmationMessage;
+    if (deleteMsg === 0 || deleteMsg === null)
+      deleteMsg = ''
 
     this.refs.eventDeletionHandler.send({
       listContainer: this.props.listContainer,
-      eventIDs: eventsToDelete
+      eventIDs: eventsToDelete,
+      hostMessage: deleteMsg
     })
 
-    this.setState({showEventPreview: false})
     this._handleDeleteModalRequestClose()
+    this.setState({showEventPreview: false})
     this._deselectRows({indexesToRemove: this.state.indexesMarkedForDeletion})
   }
 
   renderDeleteModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Delete',
-        onTouchTap: () => {
-          if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
-            this._deleteEvent()
-        },
-        ref: 'submit'
+
+    const signature = `Events Team
+Bernie 2016`;
+    const deleteReasons = [
+      {reason: 'Delete Without Message', message: 0},
+      {
+        reason: 'Event Cancelled by Host',
+        message: `This event has been cancelled by the host.
+
+You can find other events in your area by searching our event map at map.berniesanders.com or by visiting Bernie 2016 event central at http://berniesanders.com/events.
+
+When there, enter your zip code and find events in your area.
+
+Thank you for your support!
+
+${signature}`
+      },
+      {
+        reason: 'Event is a Fundraiser',
+        message: `Thank you for submitting your event to Bernie 2016 Events Central.
+
+Please note we do not approve fundraisers without prior campaign contact.
+
+You can resubmit your event following guidelines at berniesanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        reason: 'Event mentions the sale of merchandise',
+        message: `Thank you for submitting your event to Bernie 2016 Events Central.
+
+Please note we do not approve events that feature merchandise sales, neither official nor unofficial merchandise sales are sanctioned by the campaign at your event. This is due to complicated FEC requirements for fundraising.
+
+We recommend you read our guide Organizing with Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
+
+You can resubmit your event following guidelines at berniesanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        reason: 'Event mentions ballot / petitions',
+        message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
+
+Here are some things you can do:
+  - Host a house party for Bernie (distribute literature, get people signed up, etc.)
+  - Table at farmers markets or local community events.
+  - Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
+  - Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
+  - Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
+
+When you’re ready to submit your next event, visit berniesanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        reason: 'General Deletion Message',
+        message: `Your event does not meet parameters at berniesanders.com/plan.
+
+Keep in mind that each event description should include ways that Bernie Supporters can get involved in your event. Please be specific about what you are asking Bernie supporters to do, how they can get involved, and what you might want them to bring with them in support of Bernie.
+
+When in doubt, follow event creation guidelines set forth at berniesanders.com/plan. When you’re ready, you can re-submit your event there.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        // Be sure to keep this as the last option in the array,
+        // it's being referenced below as deleteReasons[deleteReasons.length-1]
+        reason: 'Custom',
+        message: `
+
+${signature}`
       }
-    ]
+    ];
+    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>);
 
     this._handleDeleteModalRequestClose = () => {
-      if (this.state.activeEventIndex) {
-        this.setState({
+      let updatedStateProps = {
           showDeleteEventDialog: false,
-          showEventPreview: true
-        })
-      } else {
-        this.setState({
-          showDeleteEventDialog: false
-        })
+          deletionConfirmationMessage: null,
+          deletionReasonIndex: null
+        };
+      if (this.state.activeEventIndex) {
+        updatedStateProps['showEventPreview'] = true;
       }
+      this.setState(updatedStateProps)
     }
 
     let numEvents = this.state.indexesMarkedForDeletion.length;
-    let s = (numEvents > 1) ? 's.' : '.'
-    let dialogTitle = 'You are about to delete ' + numEvents + ' event' + s
-    let textConfirm = (
+    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`;
+
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={this._handleDeleteModalRequestClose} />,
+      <FlatButton
+        label={(this.state.deletionConfirmationMessage) ? 'Delete & Send Message' : 'Delete'}
+        primary={true}
+        disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
+        onTouchTap={this._deleteEvent}
+      />
+    ];
+
+    let deleteMessage = (
       <div>
-        <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="TYPE HERE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+        <SelectField
+          value={this.state.deletionReasonIndex}
+          floatingLabelText="Reason For Deletion"
+          onChange={(event, index, value) => {
+            this.setState({
+              deletionReasonIndex: value,
+              deletionConfirmationMessage: deleteReasons[value].message
+            })
+          }}
+          style={{width: '350px'}}
+          floatingLabelStyle={{cursor: 'pointer'}}
+        >
+        {deleteReasonMenuItems}
+        </SelectField><br />
+        <TextField
+          floatingLabelText="Message for Event Host & Attendees"
+          value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
+          disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
+          onChange={(event) => {
+            this.setState({deletionConfirmationMessage: event.target.value});
+          }}
+          multiLine={true}
+          rowsMax={11}
+          fullWidth={true}
+          inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
+          ref="deleteConfirmationInput"
+        />
       </div>
     )
-
-    if (numEvents < 5)
-      textConfirm = <div></div>
 
     return (
       <Dialog
@@ -511,15 +655,12 @@ class AdminEventsSection extends React.Component {
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-      {textConfirm}
+      {deleteMessage}
       </Dialog>
     )
   }
 
   renderCreateModal() {
-    let standardActions = [
-      { text: 'Cancel' }
-    ]
 
     this._handleCreateModalRequestClose = () => {
       this.setState({
@@ -530,7 +671,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         title='Create an Event'
-        actions={standardActions}
         open={this.state.showCreateEventDialog}
         onRequestClose={this._handleCreateModalRequestClose}
         bodyStyle={{paddingBottom: '0'}}
@@ -545,63 +685,111 @@ class AdminEventsSection extends React.Component {
   }
 
   renderFiltersModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Clear',
-        onTouchTap: () => {
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={() => {
+          this.setState({showFiltersDialog: false});
+        }}
+      />,
+      <FlatButton
+        label="Clear"
+        secondary={true}
+        onTouchTap={() => {
           this._handleRequestFiltersChange({}, true);
           this.setState({showFiltersDialog: false});
-        }
-      },
-      { text: 'Update Filters',
-        onTouchTap: () => {
+        }}
+      />,
+      <FlatButton
+        label="Update Filters"
+        primary={true}
+        onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-            if (filter.value && filter.value != 'none'){
-              filtersObject[filter.name] = String(filter.value);
+
+            filtersObject[filter.name] = filter.value;
+
+            if (filtersObject[filter.name] === 'none'){
+              filtersObject[filter.name] = null
+            }
+            else if (filtersObject[filter.name] === 'true'){
+              filtersObject[filter.name] = true
+            }
+            else if (filtersObject[filter.name] === 'false'){
+              filtersObject[filter.name] = false
+            }
+            else if (filtersObject[filter.name]){
+              filtersObject[filter.name] = String(filter.value)
             }
             else {
-              delete filtersObject[filter.name];
+              delete filtersObject[filter.name]
             }
+
           });
+
           this._handleRequestFiltersChange(filtersObject, true);
           this.setState({showFiltersDialog: false});
-        },
-        ref: 'submit'
-      }
-    ]
+        }}
+      />,
+    ];
 
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }
 
-    const FilterInput = ({name, label}) => (
+    const FilterInput = ({name, label, type='text'}) => (
       <div>
         <label htmlFor={name} style={labelStyle}>{label}: </label>
         <input
           name={name}
           defaultValue={this.props.relay.variables.filters[name]}
-          // onChange={updateFilters}
+          type={type}
         />
       </div>
     );
 
-    const filterInputs = [
-      {name: 'venueZip', label: 'Zip Code'},
-      {name: 'eventIdObfuscated', label: 'Event ID'},
-      {name: 'eventTypeId', label: 'Event Type ID'}
+    const booleanOptions = [
+      {
+        name: 'Yes',
+        value: true
+      },
+      {
+        name: 'No',
+        value: false
+      }
     ];
+    const FilterSelect = ({name, label, options, optionName='name', optionValue='value'}) => (
+      <div>
+        <label htmlFor={name} style={labelStyle}>{label}: </label>
+        <select
+          name={name}
+          defaultValue={this.props.relay.variables.filters[name]}
+        >
+          <option value='none'>--</option>
+          {options.map((item, index) => {
+            return <option key={index} value={item[optionValue]}>{item[optionName]}</option>
+          })}
+        </select>
+      </div>
+    );
 
-    let updateFilters = (event) => {
-      let updatedValue = event.target.value
-
-      if (updatedValue == 'none')
-        {updatedValue = null}
-
-      let updatedFilters = {}
-      updatedFilters[event.target.name] = updatedValue
-
-      this._handleRequestFiltersChange(updatedFilters)
-    }
+    const filterInputs = [
+      {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'name', label: 'Event Name'},
+      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
+      {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
+      {name: 'contactPhone', label: 'Host Contact Phone'},
+      {name: 'venueName', label: 'Venue Name'},
+      {name: 'localTimezone', label: 'Timezone', type: 'select', options: USTimeZones},
+      {name: 'venueAddr1', label: 'Address Line 1'},
+      {name: 'venueAddr2', label: 'Address Line 2'},
+      {name: 'venueCity', label: 'City'},
+      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
+      {name: 'venueZip', label: 'Zip Code'},
+      {name: 'latitude', label: 'Latitude', type: 'number'},
+      {name: 'longitude', label: 'Longitude', type: 'number'},
+    ];
 
     return (
       <Dialog
@@ -619,24 +807,15 @@ class AdminEventsSection extends React.Component {
         ref='eventSearchForm'
         onSubmit={(e, data) => {
           e.preventDefault();
-          console.log('form submitted', data);
         }}
       >
-        <label htmlFor="venueState" style={labelStyle}>State: </label>
-        <select
-          name='venueState'
-          defaultValue={this.props.relay.variables.filters.venueState}
-          // onChange={updateFilters}
-        >
-          <option value='none'>--</option>
-          {states.map((item, index) => {
-            return <option key={index} value={item.abbreviation}>{item.name}</option>
-          })}
-        </select>
-        <br/>
-
         {filterInputs.map((input, index) => {
-          return <FilterInput name={input.name} label={input.label} key={index}/>
+          if (input.type == 'select'){
+            return <FilterSelect name={input.name} label={input.label} options={input.options} optionValue={input.optionValue} optionName={input.optionName} key={index} />
+          }
+          else {
+            return <FilterInput name={input.name} label={input.label} type={input.type} key={index} />
+          }
         })}
       </form>
       </Dialog>
@@ -664,6 +843,7 @@ class AdminEventsSection extends React.Component {
       <FlatButton
         label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
         key="3"
+        disabled={this.props.relay.variables.filters.flagApproval === false && this.state.previewTabIndex === 0}
         secondary={true}
         onTouchTap={() => {
           this.refs.eventEdit.refs.component.submit()
@@ -683,7 +863,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         actions={customActions}
-        actionFocus="submit"
         open={this.state.showEventPreview}
         onRequestClose={this._handlePreviewRequestClose}
         contentStyle={{maxWidth: '1200px', width: '90%'}}
@@ -746,10 +925,10 @@ class AdminEventsSection extends React.Component {
   }
 
 
-  _handleRequestFiltersChange = (newVars, force) => {
-    let oldVars = this.props.relay.variables.filters
+  _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
+    let oldVars = this.props.relay.variables.filters;
 
-    if (force) {
+    if (doNotPreserveOldFilters) {
       if (!newVars.hasOwnProperty('flagApproval')) {
         newVars['flagApproval'] = oldVars['flagApproval']
       }
@@ -771,12 +950,6 @@ class AdminEventsSection extends React.Component {
       previewTabIndex: tabIndex,
       approveOnUpdate: true
     })
-  }
-
-  _handlePublicEventOpen = (eventIndex) => {
-    let events = this.props.listContainer.events.edges
-
-    window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated'])
   }
 
   _iterateActiveEvent = (n) => {
@@ -911,19 +1084,19 @@ class AdminEventsSection extends React.Component {
   }
 
   render() {
-    let events = this.props.listContainer.events.edges
+    let events = this.props.listContainer.events.edges;
 
     return (
     <div>
       <MutationHandler
         ref='eventDeletionHandler'
-        successMessage='Event deleted!'
+        successMessage={`${this.state.indexesMarkedForDeletion.length} event${plurry(this.state.indexesMarkedForDeletion.length)} deleted`}
         mutationClass={DeleteEvents}
       />
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
-        successMessage="Events edited successfully!"
+        successMessage='Event(s) updated successfully'
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
@@ -937,6 +1110,7 @@ class AdminEventsSection extends React.Component {
         rowsCount={events.length}
         width={this.state.windowWidth}
         height={this.state.windowHeight - 112}
+        // rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -967,10 +1141,18 @@ class AdminEventsSection extends React.Component {
           />
         </ColumnGroup>
         <ColumnGroup
-          header={<this.HeaderCell content="Event Type" />}>
+          header={<this.HeaderCell content="Event" />}
+        >
           <Column
             flexGrow={1}
-            header={<this.SortControllerCell content="Event Type" attribute="eventTypeId" />}
+            header={<this.HeaderCell content="ID" />}
+            cell={<this.EventIdLinkCell data={events} />}
+            width={100}
+            align='center'
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
             cell={
               <this.EventTypeCell data={events} col="eventType" attr="name" />
             }
@@ -980,13 +1162,13 @@ class AdminEventsSection extends React.Component {
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
           <Column
-            header={<this.SortControllerCell content="Date of event" attribute="startDate" />}
+            header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
             cell={<this.DateCell data={events} col="startDate" />}
             flexGrow={1}
             width={170}
           />
           <Column
-            header={<this.SortControllerCell content="Date created" attribute="Date" />}
+            header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
             cell={<this.DateCell data={events} col="createDate" />}
             flexGrow={1}
             width={170}
@@ -1025,21 +1207,6 @@ class AdminEventsSection extends React.Component {
             cell={<this.TextCell data={events} col="attendeesCount" />}
             width={100}
             align='center'
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="ID" />}
-            cell={<this.TextCell data={events} col="eventIdObfuscated" />}
-            width={100}
-            align='center'
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Event Type ID" attribute="eventTypeId" />}
-            cell={
-              <this.EventTypeCell data={events} col="eventType" attr="id" />
-            }
-            width={130}
           />
         </ColumnGroup>
         <ColumnGroup
@@ -1097,6 +1264,20 @@ class AdminEventsSection extends React.Component {
             width={120}
             align='center'
           />
+          <Column
+            header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
+            cell={<this.TextCell data={events} col="latitude" />}
+            flexGrow={1}
+            width={150}
+            align='center'
+          />
+          <Column
+            header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
+            cell={<this.TextCell data={events} col="longitude" />}
+            flexGrow={1}
+            width={150}
+            align='center'
+          />
         </ColumnGroup>
       </Table>
     </div>
@@ -1117,6 +1298,10 @@ export default Relay.createContainer(AdminEventsSection, {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
         ${EditEvents.getFragment('listContainer')}
+        eventTypes {
+          id
+          name
+        }
         events(
           first: $numEvents
           filterOptions: $filters
@@ -1140,6 +1325,7 @@ export default Relay.createContainer(AdminEventsSection, {
               }
               eventIdObfuscated
               flagApproval
+              isOfficial
               description
               venueName
               latitude
