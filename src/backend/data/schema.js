@@ -984,15 +984,13 @@ const GraphQLEvent = new GraphQLObjectType({
     attendees: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async (event, _, {rootValue}) => {
-        /*const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
+        const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
         let attendees = [];
         for (let i = 0; i < attendeeIds.length; i++) {
           let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
           attendees.push(attendee);
         }
         return attendees
-        */
-        return []
       }
     },
     nearbyPeople: {
@@ -1120,7 +1118,7 @@ const GraphQLSurvey = new GraphQLObjectType({
     fullURL: {
       type: GraphQLString,
       resolve: async (survey, _, {rootValue}) => {
-        log.info(`Getting slug for ${survey, survey.signup_form_id}`)
+        log.info(`Getting slug for survey ${survey.signup_form_id}`)
         let underlyingSurvey = await rootValue.loaders.bsdSurveys.load(survey.signup_form_id)
         let slug = underlyingSurvey.signup_form_slug
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
