@@ -29,11 +29,6 @@
         }
       }
     },
-    "acorn-to-esprima": {
-      "version": "2.0.8",
-      "from": "acorn-to-esprima@>=2.0.4 <3.0.0",
-      "resolved": "https://registry.npmjs.org/acorn-to-esprima/-/acorn-to-esprima-2.0.8.tgz"
-    },
     "after": {
       "version": "0.8.1",
       "from": "after@0.8.1",
@@ -1150,23 +1145,6 @@
       "from": "detective@>=4.3.1 <5.0.0",
       "resolved": "https://registry.npmjs.org/detective/-/detective-4.3.1.tgz"
     },
-    "doctrine": {
-      "version": "1.2.0",
-      "from": "doctrine@>=1.2.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/doctrine/-/doctrine-1.2.0.tgz",
-      "dependencies": {
-        "esutils": {
-          "version": "1.1.6",
-          "from": "esutils@>=1.1.6 <2.0.0",
-          "resolved": "https://registry.npmjs.org/esutils/-/esutils-1.1.6.tgz"
-        },
-        "isarray": {
-          "version": "1.0.0",
-          "from": "isarray@>=1.0.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
-        }
-      }
-    },
     "dom-helpers": {
       "version": "2.4.0",
       "from": "dom-helpers@>=2.2.4 <3.0.0",
@@ -1432,18 +1410,6 @@
           "version": "4.0.1",
           "from": "object-assign@>=4.0.1 <5.0.0",
           "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.0.1.tgz"
-        }
-      }
-    },
-    "espree": {
-      "version": "3.1.1",
-      "from": "espree@>=3.1.1 <4.0.0",
-      "resolved": "https://registry.npmjs.org/espree/-/espree-3.1.1.tgz",
-      "dependencies": {
-        "acorn": {
-          "version": "3.0.4",
-          "from": "acorn@>=3.0.4 <4.0.0",
-          "resolved": "https://registry.npmjs.org/acorn/-/acorn-3.0.4.tgz"
         }
       }
     },
@@ -2655,11 +2621,6 @@
       "from": "ieee754@>=1.1.4 <2.0.0",
       "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.1.6.tgz"
     },
-    "ignore": {
-      "version": "2.2.19",
-      "from": "ignore@>=2.2.19 <3.0.0",
-      "resolved": "https://registry.npmjs.org/ignore/-/ignore-2.2.19.tgz"
-    },
     "ignore-by-default": {
       "version": "1.0.1",
       "from": "ignore-by-default@>=1.0.0 <2.0.0",
@@ -3141,6 +3102,11 @@
       "version": "3.10.1",
       "from": "lodash@>=3.2.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
+    },
+    "lodash-es": {
+      "version": "4.8.0",
+      "from": "lodash-es@>=4.2.1 <5.0.0",
+      "resolved": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.8.0.tgz"
     },
     "lodash._baseassign": {
       "version": "3.2.0",
@@ -4469,6 +4435,18 @@
       "from": "react-quill@>=0.3.0 <0.4.0",
       "resolved": "https://registry.npmjs.org/react-quill/-/react-quill-0.3.0.tgz"
     },
+    "react-redux": {
+      "version": "4.4.1",
+      "from": "react-redux@latest",
+      "resolved": "https://registry.npmjs.org/react-redux/-/react-redux-4.4.1.tgz",
+      "dependencies": {
+        "lodash": {
+          "version": "4.8.1",
+          "from": "lodash@>=4.2.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.8.1.tgz"
+        }
+      }
+    },
     "react-relay": {
       "version": "0.4.0",
       "from": "react-relay@>=0.4.0 <0.5.0",
@@ -4591,6 +4569,17 @@
           "version": "0.1.0",
           "from": "balanced-match@>=0.1.0 <0.2.0",
           "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-0.1.0.tgz"
+        }
+      }
+    },
+    "redux": {
+      "version": "3.3.1",
+      "from": "redux@latest",
+      "resolved": "https://registry.npmjs.org/redux/-/redux-3.3.1.tgz",
+      "dependencies": {
+        "lodash": {
+          "version": "4.8.1",
+          "from": "lodash@>=4.2.1 <5.0.0"
         }
       }
     },
@@ -4830,11 +4819,6 @@
       "version": "1.4.3",
       "from": "shell-quote@>=1.4.2 <1.5.0",
       "resolved": "https://registry.npmjs.org/shell-quote/-/shell-quote-1.4.3.tgz"
-    },
-    "shelljs": {
-      "version": "0.5.3",
-      "from": "shelljs@>=0.5.3 <0.6.0",
-      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.5.3.tgz"
     },
     "simple-assign": {
       "version": "0.1.0",
