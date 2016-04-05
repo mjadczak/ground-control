@@ -23,7 +23,7 @@ import ApprovalFilterDropdown from './toolbar/ApprovalFilterDropdown'
 import RequestLengthDropdown from './toolbar/RequestLengthDropdown'
 
 
-const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog, history}) =>
+const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog}, {history}) =>
   <Toolbar>
     <ToolbarGroup key={0} float="left">
       <ApprovalFilterDropdown />
@@ -45,7 +45,7 @@ const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog, history}) =>
         label="RSVPs"
         labelPosition="after"
         onTouchTap={() => {
-              window.location = '/admin/events/upload-rsvps'
+              history.push('/admin/events/upload-rsvps')
             }}
         style={{marginRight: 0}}
       >
@@ -55,7 +55,7 @@ const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog, history}) =>
       <RaisedButton
         label="Create"
         labelPosition="after"
-        onTouchTap={() => history.push('/admin/events/create')}
+        onTouchTap={() => window.location = '/admin/events/create'}
       >
         <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>add</FontIcon>
       </RaisedButton>
@@ -88,6 +88,16 @@ const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog, history}) =>
       />
     </ToolbarGroup>
   </Toolbar>
+
+EventsToolbar.contextTypes = {
+  history: React.PropTypes.object.isRequired //With react-router v2.x this will change to a `router` func (not object)
+}
+
+EventsToolbar.propTypes = {
+  eventsQuery: React.PropTypes.object.isRequired,
+  visibleDialogs: React.PropTypes.object.isRequired,
+  showDialog: React.PropTypes.func.isRequired
+}
 
 const mapStoreToProps = (store, ownProps) => ({
   eventsQuery: store.admin.events.eventsQuery,
