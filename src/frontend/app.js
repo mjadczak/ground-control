@@ -10,7 +10,7 @@ import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
-import AdminEventsSection from './components/AdminEventsSection';
+import AdminEventsSectionLegacy from './components/AdminEventsSectionLegacy';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import ConstituentLookup from './components/ConstituentLookup';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
@@ -40,6 +40,8 @@ import {createHistory} from 'history';
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
+import AdminEventsSection from './components/AdminEventsSection'
+
 
 window.jQuery = jQuery;
 window.log = log;
@@ -141,12 +143,21 @@ ReactDOM.render(
       />
 
       <Route
-        path='events'
-        component={AdminEventsSection}
+        path='events-legacy'
+        component={AdminEventsSectionLegacy}
         queries={{
           ...CurrentUserQueries,
           ...ListContainerQueries
         }}
+        renderLoading={() => <Loading />}
+      />
+      <Route
+        path='events'
+        component={AdminEventsSection}
+        // queries={{
+        //   ...CurrentUserQueries,
+        //   ...ListContainerQueries
+        // }}
         renderLoading={() => <Loading />}
       />
       <Route
