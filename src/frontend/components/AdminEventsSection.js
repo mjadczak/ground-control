@@ -11,10 +11,11 @@ let relayDependencies = {
   }
 }
 
-const AdminEventsSection = ({history}) =>
+const AdminEventsSection = () =>
   <Provider store={store}>
-    <EventsToolbar history={history}/>
+    <EventsToolbar />
   </Provider>
 
 // export default Relay.createContainer(AdminEventsSection, relayDependencies)
+
 export default AdminEventsSection
