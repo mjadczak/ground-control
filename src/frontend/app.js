@@ -10,29 +10,29 @@ import ReactRouterRelay from 'react-router-relay'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import AdminDashboard from './components/AdminDashboard'
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
-import AdminEventsSection from './components/AdminEventsSection'
-import AdminEventUploadRsvps from './components/AdminEventUploadRsvps'
-import ConstituentLookup from './components/ConstituentLookup'
-import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection'
-import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm'
-import FastFwdForm from './components/FastFwdForm'
-import GCTextField from './components/forms/GCTextField'
-import GCPhoneField from './components/forms/GCPhoneField'
-import GCDateField from './components/forms/GCDateField'
-import GCDateTimeField from './components/forms/GCDateTimeField'
-import GCTimeField from './components/forms/GCTimeField'
-import GCPasswordField from './components/forms/GCPasswordField'
-import GCRadioButtonsField from './components/forms/GCRadioButtonsField'
-import GCSelectField from './components/forms/GCSelectField'
-import GCCheckboxesField from './components/forms/GCCheckboxesField'
-import GCBooleanField from './components/forms/GCBooleanField'
-import GCToggleField from './components/forms/GCToggleField'
-import CallAssignmentsDashboard from './components/CallAssignmentsDashboard'
-import AdminCallAssignment from './components/AdminCallAssignment'
-import CallAssignment from './components/CallAssignment'
-import CallAssignmentsSection from './components/CallAssignmentsSection'
-import Dashboard from './components/Dashboard'
-import Signup from './components/Signup'
+import AdminEventsSectionLegacy from './components/AdminEventsSectionLegacy';
+import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
+import ConstituentLookup from './components/ConstituentLookup';
+import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
+import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
+import FastFwdForm from './components/FastFwdForm';
+import GCTextField from './components/forms/GCTextField';
+import GCPhoneField from './components/forms/GCPhoneField';
+import GCDateField from './components/forms/GCDateField';
+import GCDateTimeField from './components/forms/GCDateTimeField';
+import GCTimeField from './components/forms/GCTimeField';
+import GCPasswordField from './components/forms/GCPasswordField';
+import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
+import GCSelectField from './components/forms/GCSelectField';
+import GCCheckboxesField from './components/forms/GCCheckboxesField';
+import GCBooleanField from './components/forms/GCBooleanField';
+import GCToggleField from './components/forms/GCToggleField';
+import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
+import AdminCallAssignment from './components/AdminCallAssignment';
+import CallAssignment from './components/CallAssignment';
+import CallAssignmentsSection from './components/CallAssignmentsSection';
+import Dashboard from './components/Dashboard';
+import Signup from './components/Signup';
 import NotFound from './components/NotFound'
 import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal'
@@ -42,6 +42,8 @@ import log from './log'
 import Loading from './components/Loading'
 import UserAccountDashboard from './components/UserAccountDashboard'
 import UserAccountChangePasswordForm from './components/UserAccountChangePasswordForm'
+import AdminEventsSection from './components/AdminEventsSection'
+
 
 window.jQuery = jQuery
 window.log = log
@@ -143,12 +145,21 @@ ReactDOM.render(
       />
 
       <Route
-        path='events'
-        component={AdminEventsSection}
+        path='events-legacy'
+        component={AdminEventsSectionLegacy}
         queries={{
           ...CurrentUserQueries,
           ...ListContainerQueries
         }}
+        renderLoading={() => <Loading />}
+      />
+      <Route
+        path='events'
+        component={AdminEventsSection}
+        // queries={{
+        //   ...CurrentUserQueries,
+        //   ...ListContainerQueries
+        // }}
         renderLoading={() => <Loading />}
       />
       <Route
