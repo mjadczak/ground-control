@@ -25,3 +25,21 @@ export function deleteSelectedEvents() {
     type: DELETE_SELECTED_EVENTS
   }
 }
+
+export const SELECT_EVENT = Symbol('SELECT_EVENT')
+
+export function selectEvent(eventID) {
+  return {
+    type: SELECT_EVENT,
+    eventID
+  }
+}
+
+export const DESELECT_EVENT = Symbol('DESELECT_EVENT')
+
+export function deselectEvent(eventID) {
+  return {
+    type: DESELECT_EVENT,
+    eventID
+  }
+}

@@ -21,9 +21,9 @@ import {connect} from 'react-redux';
 import {showDialog} from '../../../redux/admin/events/actions'
 import ApprovalFilterDropdown from './toolbar/ApprovalFilterDropdown'
 import RequestLengthDropdown from './toolbar/RequestLengthDropdown'
+import ImmutablePropTypes from 'react-immutable-proptypes'
 
-
-const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog}, {history}) =>
+const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog, selectedEvents}, {history}) =>
   <Toolbar>
     <ToolbarGroup key={0} float="left">
       <ApprovalFilterDropdown />
@@ -63,29 +63,38 @@ const EventsToolbar = ({eventsQuery, visibleDialogs, showDialog}, {history}) =>
       <RaisedButton
         label="Delete"
         primary={true}
-        // disabled={(this.state.selectedRows.length == 0)}
+        disabled={selectedEvents.isEmpty()}
         // onTouchTap={() => {
         //       this._handleEventDeletion(this.state.selectedRows);
         //     }}
       />
-      <RaisedButton
-        label='Unapprove'
-        style={{marginLeft: 0}}
-        secondary={false}
-        // disabled={(this.state.selectedRows.length == 0 || eventsQuery.status === 'PENDING_APPROVAL')}
-        // onTouchTap={() => {
-        //       this._handleEventConfirmation(this.state.selectedRows, true);
-        //     }}
-      />
-      <RaisedButton
-        label={(eventsQuery.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
-        style={{marginLeft: 0}}
-        secondary={true}
-        // disabled={(this.state.selectedRows.length == 0 || eventsQuery.status === 'APPROVED')}
-        // onTouchTap={() => {
-        //       this._handleEventConfirmation(this.state.selectedRows);
-        //     }}
-      />
+      { eventsQuery.status === 'PENDING_APPROVAL' //TODO: change these statuses to symbols?
+        ? null
+        :
+        <RaisedButton
+          label='Unapprove'
+          style={{marginLeft: 0}}
+          secondary={false}
+          disabled={selectedEvents.isEmpty()}
+          // onTouchTap={() => {
+          //       this._handleEventConfirmation(this.state.selectedRows, true);
+          //     }}
+        />
+      }
+      { eventsQuery.status === 'APPROVED' //TODO: as above
+        ? null
+        :
+        <RaisedButton
+          label={(eventsQuery.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
+          style={{marginLeft: 0}}
+          secondary={true}
+          disabled={selectedEvents.isEmpty()}
+
+          // onTouchTap={() => {
+          //       this._handleEventConfirmation(this.state.selectedRows);
+          //     }}
+        />
+      }
     </ToolbarGroup>
   </Toolbar>
 
@@ -94,14 +103,16 @@ EventsToolbar.contextTypes = {
 }
 
 EventsToolbar.propTypes = {
-  eventsQuery: React.PropTypes.object.isRequired,
-  visibleDialogs: React.PropTypes.object.isRequired,
+  eventsQuery: ImmutablePropTypes.record.isRequired,
+  visibleDialogs: ImmutablePropTypes.record.isRequired,
+  selectedEvents: ImmutablePropTypes.set.isRequired,
   showDialog: React.PropTypes.func.isRequired
 }
 
 const mapStoreToProps = (store, ownProps) => ({
   eventsQuery: store.admin.events.eventsQuery,
-  visibleDialogs: store.admin.events.visibleDialogs
+  visibleDialogs: store.admin.events.visibleDialogs,
+  selectedEvents: store.admin.events.selectedEvents
 })
 
 const mapDispatchToProps = (dispatch) => ({
