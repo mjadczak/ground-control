@@ -1,64 +1,20 @@
-import qs from 'qs'
+import JSURL from 'jsurl'
 import Immutable from 'immutable'
 import {createReducer} from 'redux-immutablejs'
 import * as actions from './actions'
 
 //Reducers handling state for the AdminEventsSection
 
-//<editor-fold desc="Helpers">
-//Helpers
-const convertType = (value) => {
-  if (typeof value === 'object') {
-    let updatedValue = {}
-    Object.keys(value).forEach((key) => {
-      const currentValue = convertType(value[key])
-      if (currentValue != undefined)
-        value[key] = currentValue
-    })
-    return value
-  }
-  else if (value === 'none')
-    return null
-  else if (value === 'true')
-    return true
-  else if (value === 'false')
-    return false
-  else if (value != '' && !isNaN(value) && String(Number(value)) === value)
-    return Number(value)
-  else if (value)
-    return String(value)
-  else {
-    return undefined
-  }
-}
-
-
-//</editor-fold>
-
 //<editor-fold desc="Events Query">
 //Events query state
 const getEventsQueryFromHash = () => {
-  const hashParams  = convertType(qs.parse(location.hash.substr(1), {strictNullHandling: true}))
-  let defaultParams = {
-    numEvents: 100,
-    sortField: 'startDate',
-    sortDirection: 'ASC',
-    status: 'PENDING_REVIEW',
-    filters: {},
-    hostFilters: {}
-  }
-  if (hashParams.query) {
-    try {
-      let newQueryParams     = {...defaultParams, ...hashParams.query}
-      newQueryParams.filters = {...defaultParams.filters, ...hashParams.query.filters}
-      return newQueryParams
-    }
-    catch (ex) {
-      console.error('Invalid query parameters', ex)
-    }
-  }
-
-  return defaultParams
+  let parsed = JSURL.parse(location.hash)
+  if (!parsed) return {}
+  if (!parsed.admin) return {}
+  if (!parsed.admin.events) return {}
+  if (!parsed.admin.events.query) return {}
+  //Could use a null-chaining operator right about now
+  return parsed.admin.events.query
 }
 
 const EventsQueryRecord = Immutable.Record({
@@ -71,7 +27,18 @@ const EventsQueryRecord = Immutable.Record({
 }, 'EventsQueryRecord')
 
 export const eventsQuery = createReducer(new EventsQueryRecord(getEventsQueryFromHash()), {
-  [actions.CHANGE_QUERY]: (eventsQuery, action) => eventsQuery.merge(action.query)
+  [actions.CHANGE_QUERY]: (eventsQuery, action) => {
+    //Save off location into the hash
+    let newState = eventsQuery.merge(action.query)
+    location.hash = JSURL.stringify({
+      admin: {
+        events: {
+          query: newState.toJS()
+        }
+      }
+    })
+    return newState
+  }
 })
 //</editor-fold>
 

@@ -1,6 +1,9 @@
 //Actions for the AdminEventsSection
 
-export const CHANGE_QUERY = Symbol('CHANGE_QUERY')
+const actionPrefix = 'ADMIN/EVENTS/'
+const mkSymbol = (name) => Symbol(actionPrefix + name)
+
+export const CHANGE_QUERY = mkSymbol('CHANGE_QUERY')
 
 export function changeQuery(query) {
   return {
@@ -9,7 +12,7 @@ export function changeQuery(query) {
   }
 }
 
-export const SHOW_DIALOG = Symbol('SHOW_DIALOG')
+export const SHOW_DIALOG = mkSymbol('SHOW_DIALOG')
 
 export function showDialog(dialogName) {
   return {
@@ -18,11 +21,30 @@ export function showDialog(dialogName) {
   }
 }
 
-export const DELETE_SELECTED_EVENTS = Symbol('DELETE_EVENTS')
+export const DELETE_EVENTS = mkSymbol('DELETE_EVENTS')
 
-export function deleteSelectedEvents() {
+export function deleteEvents(eventIDs) {
   return {
-    type: DELETE_SELECTED_EVENTS
+    type: DELETE_EVENTS,
+    eventIDs
+  }
+}
+
+export const APPROVE_EVENTS = mkSymbol('APPROVE_EVENTS')
+
+export function approveEvents(eventIDs) {
+  return {
+    type: APPROVE_EVENTS,
+    eventIDs
+  }
+}
+
+export const UNAPPROVE_EVENTS = mkSymbol('UNAPPROVE_EVENTS')
+
+export function unapproveEvents(eventIDs) {
+  return {
+    type: UNAPPROVE_EVENTS,
+    eventIDs
   }
 }
 
@@ -35,7 +57,7 @@ export function selectEvent(eventID) {
   }
 }
 
-export const DESELECT_EVENT = Symbol('DESELECT_EVENT')
+export const DESELECT_EVENT = mkSymbol('DESELECT_EVENT')
 
 export function deselectEvent(eventID) {
   return {

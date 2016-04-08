@@ -3014,6 +3014,11 @@
         }
       }
     },
+    "jsurl": {
+      "version": "0.1.2",
+      "from": "jsurl@latest",
+      "resolved": "https://registry.npmjs.org/jsurl/-/jsurl-0.1.2.tgz"
+    },
     "juice": {
       "version": "1.10.0",
       "from": "juice@>=1.0.0 <2.0.0",
