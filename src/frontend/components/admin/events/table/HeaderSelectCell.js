@@ -7,8 +7,8 @@ import {BernieText, BernieColors} from '../../../styles/bernie-css'
 import {selectEvents, deselectAllEvents} from '../../../../redux/admin/events/actions'
 import Relay from 'react-relay'
 
-const HeaderSelectCell = ({areSomeChecked, areAllChecked, handleMasterChecked, selectAllEvents, deselectAllEvents}) =>
-  <HeaderCell>
+const HeaderSelectCell = ({areSomeChecked, areAllChecked, handleMasterChecked, selectAllEvents, deselectAllEvents, ...props}) =>
+  <HeaderCell {...props}>
     <Checkbox
       checked={areSomeChecked}
       onCheck={(event, currentlyChecked) => {

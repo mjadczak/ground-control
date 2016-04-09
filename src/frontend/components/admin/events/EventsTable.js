@@ -28,23 +28,37 @@ import EventIDLinkCell from './table/EventIDLinkCell'
 import EventTypeCell from './table/EventTypeCell'
 import StartDateCell from './table/StartDateCell'
 import CreateDateCell from './table/CreateDateCell'
+import * as TC from './table/TextCells'
 import Relay from 'react-relay'
 
 const EventsTable = ({events}, {windowWidth, windowHeight}) => {
   //Styling
-  let tableStyle = {
+  const tableStyle = {
     rowHeight: 83,
     groupHeaderHeight: 35,
     headerHeight: 50
   }
 
-  let miscStyles = {
+  const miscStyles = {
     selectCellWidth: 73,
     idCellWidth: 100,
     typeCellWidth: 130,
     dateCellWidth: 170,
     nameCellWidth: 250,
-    descriptionCellWidth: 450
+    descriptionCellWidth: 450,
+    hostEmailCellWidth: 220,
+    hostNameCellWidth: 150,
+    hostPhoneCellWidth: 100,
+    durationCellWidth: 110,
+    capacityCellWidth: 100,
+    rsvpsCellWidth: 100,
+    venueNameCellWidth: 150,
+    venueAddrCellWidth: 150,
+    venueCityCellWidth: 150,
+    venueStateCellWidth: 80,
+    venueZipCellWidth: 120,
+    latitudeCellWidth: 150,
+    longitudeCellWidth: 150
   }
 
   //Helpers
@@ -113,13 +127,13 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="name">Event Name</SortControllerCell>}
-        cell={<this.TextCell data={events} col="name" />}
+        cell={cellFunc(TC.EventNameCell)}
         width={miscStyles.nameCellWidth}
       />
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="description">Description</SortControllerCell>}
-        cell={<this.NoHTMLCell data={events} col="description" />}
+        cell={cellFunc(TC.EventDescriptionCell)}
         width={miscStyles.descriptionCellWidth}
       />
     </ColumnGroup>
@@ -128,42 +142,42 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       <Column
         flexGrow={1}
         header={<HeaderCell >Email</HeaderCell>}
-        cell={<this.HostInfoCell data={events} col="host" info="email" />}
-        width={220}
+        cell={cellFunc(TC.EventHostEmailCell)}
+        width={miscStyles.hostEmailCellWidth}
       />
       <Column
         flexGrow={1}
         header={<HeaderCell>Name</HeaderCell>}
-        cell={<this.HostInfoCell data={events} col="host" info="name" />}
-        width={150}
+        cell={cellFunc(TC.EventHostNameCell)}
+        width={miscStyles.hostNameCellWidth}
       />
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="contactPhone">Phone</SortControllerCell>}
-        cell={<this.TextCell data={events} col="contactPhone" />}
-        width={100}
+        cell={cellFunc(TC.EventHostPhoneCell)}
+        width={miscStyles.hostPhoneCellWidth}
       />
     </ColumnGroup>
     <ColumnGroup
       header={<HeaderCell >Detailed Info</HeaderCell>}>
       <Column
         header={<SortControllerCell attribute="duration">Duration</SortControllerCell>}
-        cell={<this.DurationCell data={events} col="duration" />}
+        cell={cellFunc(TC.EventDurationCell)}
         flexGrow={1}
-        width={110}
+        width={miscStyles.durationCellWidth}
       />
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="capacity">Capacity</SortControllerCell>}
-        cell={<this.TextCell data={events} col="capacity" />}
-        width={100}
+        cell={cellFunc(TC.EventCapacityCell)}
+        width={miscStyles.capacityCellWidth}
         align='center'
       />
       <Column
         flexGrow={1}
         header={<HeaderCell >RSVPs</HeaderCell>}
-        cell={<this.TextCell data={events} col="attendeesCount" />}
-        width={100}
+        cell={cellFunc(TC.AttendeesCountCell)}
+        width={miscStyles.rsvpsCellWidth}
         align='center'
       />
     </ColumnGroup>
@@ -171,48 +185,48 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       header={<HeaderCell>Event Location</HeaderCell>}>
       <Column
         header={<SortControllerCell attribute="venueName">Venue</SortControllerCell>}
-        cell={<this.TextCell data={events} col="venueName" />}
+        cell={cellFunc(TC.VenueNameCell)}
         flexGrow={1}
-        width={150}
+        width={miscStyles.venueNameCellWidth}
       />
       <Column
         header={<SortControllerCell attribute="venueAddr1">Address</SortControllerCell>}
-        cell={<this.TextCell data={events} col="venueAddr1" />}
+        cell={cellFunc(TC.VenueAddressCell)}
         flexGrow={1}
-        width={150}
+        width={miscStyles.venueAddrCellWidth}
       />
       <Column
         header={<SortControllerCell attribute="venueCity">City</SortControllerCell>}
-        cell={<this.TextCell data={events} col="venueCity" />}
+        cell={cellFunc(TC.VenueCityCell)}
         flexGrow={1}
-        width={150}
+        width={miscStyles.venueCityCellWidth}
       />
       <Column
         header={<SortControllerCell attribute="venueState">State</SortControllerCell>}
-        cell={<this.TextCell data={events} col="venueState" />}
+        cell={cellFunc(TC.VenueStateCell)}
         flexGrow={1}
-        width={80}
+        width={miscStyles.venueStateCellWidth}
         align='center'
       />
       <Column
         header={<SortControllerCell attribute="venueZip">Zip Code</SortControllerCell>}
-        cell={<this.TextCell data={events} col="venueZip" />}
+        cell={cellFunc(TC.VenueZipCell)}
         flexGrow={1}
-        width={120}
+        width={miscStyles.venueZipCellWidth}
         align='center'
       />
       <Column
         header={<SortControllerCell attribute="latitude">Latitude</SortControllerCell>}
-        cell={<this.TextCell data={events} col="latitude" />}
+        cell={cellFunc(TC.LatitudeCell)}
         flexGrow={1}
-        width={150}
+        width={miscStyles.latitudeCellWidth}
         align='center'
       />
       <Column
         header={<SortControllerCell attribute="longitude">Longitude</SortControllerCell>}
-        cell={<this.TextCell data={events} col="longitude" />}
+        cell={cellFunc(TC.LongitudeCell)}
         flexGrow={1}
-        width={150}
+        width={miscStyles.longitudeCellWidth}
         align='center'
       />
     </ColumnGroup>
@@ -229,6 +243,12 @@ const EventsTableWrapped = (props) =>
     <EventsTable {...props} />
   </WindowSizeProvider>
 
+const tcFragments = TC.keys().map(cell => TC[cell].getFragment('event'))
+let tcNewlines = new Array(tcFragments.length - 1).fill('\n')
+tcNewlines.unshift('fragment on Event { \n')
+tcNewlines.push('\n}')
+const combinedTCFragment = Relay.QL(tcNewlines, ...tcFragments)
+
 const relayConnectedEventsTableWrapped = Relay.createContainer(EventsTableWrapped, {
   fragments: {
     events: () => Relay.QL`
@@ -242,6 +262,7 @@ const relayConnectedEventsTableWrapped = Relay.createContainer(EventsTableWrappe
             ${EventTypeCell.getFragment('event')}
             ${StartDateCell.getFragment('event')}
             ${CreateDateCell.getFragment('event')}
+            ${combinedTCFragment}
           }
         }
       }

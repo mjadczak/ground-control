@@ -4,7 +4,7 @@ import BodyCell from './BodyCell'
 import Relay from 'react-relay'
 
 const EventTypeCell = ({event, ...props}) =>
-  <BodyCell>
+  <BodyCell {...props}>
     {event.eventType.name}
   </BodyCell>
 
