@@ -25,6 +25,9 @@ import HeaderSelectCell from './table/HeaderSelectCell'
 import SortControllerCell from './table/SortControllerCell'
 import SelectCell from './table/SelectCell'
 import EventIDLinkCell from './table/EventIDLinkCell'
+import EventTypeCell from './table/EventTypeCell'
+import StartDateCell from './table/StartDateCell'
+import CreateDateCell from './table/CreateDateCell'
 import Relay from 'react-relay'
 
 const EventsTable = ({events}, {windowWidth, windowHeight}) => {
@@ -36,12 +39,17 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
   }
 
   let miscStyles = {
-    selectCellWidth: 73
+    selectCellWidth: 73,
+    idCellWidth: 100,
+    typeCellWidth: 130,
+    dateCellWidth: 170,
+    nameCellWidth: 250,
+    descriptionCellWidth: 450
   }
 
   //Helpers
-  const cellFunc = (Component) => (
-    (rowIndex, width, height) => <Component event={events[rowIndex]} {...{width, height}} />
+  const cellFunc = (Component, props = {}) => (
+    (rowIndex, width, height) => <Component event={events[rowIndex]} {...{width, height, ...props}} />
   )
 
   return <Table
@@ -75,31 +83,29 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
         flexGrow={1}
         header={<HeaderCell>ID</HeaderCell>}
         cell={cellFunc(EventIDLinkCell)}
-        width={100}
+        width={miscStyles.idCellWidth}
         align='center'
       />
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="eventTypeId">Type</SortControllerCell>}
-        cell={
-              <this.EventTypeCell data={events} col="eventType" attr="name" />
-            }
-        width={130}
+        cell={cellFunc(EventTypeCell)}
+        width={miscStyles.typeCellWidth}
       />
     </ColumnGroup>
     <ColumnGroup
       header={<HeaderCell>Time</HeaderCell>}>
       <Column
         header={<SortControllerCell attribute="startDate">Event Date</SortControllerCell>}
-        cell={<this.DateCell data={events} col="startDate" />}
+        cell={cellFunc(StartDateCell)}
         flexGrow={1}
-        width={170}
+        width={miscStyles.dateCellWidth}
       />
       <Column
         header={<SortControllerCell attribute="createDate">Create Date</SortControllerCell>}
-        cell={<this.DateCell data={events} col="createDate" />}
+        cell={cellFunc(CreateDateCell)}
         flexGrow={1}
-        width={170}
+        width={miscStyles.dateCellWidth}
       />
     </ColumnGroup>
     <ColumnGroup
@@ -108,13 +114,13 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
         flexGrow={1}
         header={<SortControllerCell attribute="name">Event Name</SortControllerCell>}
         cell={<this.TextCell data={events} col="name" />}
-        width={250}
+        width={miscStyles.nameCellWidth}
       />
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="description">Description</SortControllerCell>}
         cell={<this.NoHTMLCell data={events} col="description" />}
-        width={450}
+        width={miscStyles.descriptionCellWidth}
       />
     </ColumnGroup>
     <ColumnGroup
@@ -233,6 +239,9 @@ const relayConnectedEventsTableWrapped = Relay.createContainer(EventsTableWrappe
             ${SelectCell.getFragment('event')}
             #TODO ActionCell
             ${EventIDLinkCell.getFragment('event')}
+            ${EventTypeCell.getFragment('event')}
+            ${StartDateCell.getFragment('event')}
+            ${CreateDateCell.getFragment('event')}
           }
         }
       }
