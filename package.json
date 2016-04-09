@@ -27,7 +27,7 @@
     "babel-core": "^5.8.25",
     "babel-loader": "^5.3.2",
     "babel-register": "^6.2.0",
-    "babel-relay-plugin": "^0.3.0",
+    "babel-relay-plugin": "^0.7.3",
     "babyparse": "^0.4.3",
     "bcrypt": "^0.8.5",
     "bluebird": "^2.10.2",
@@ -51,8 +51,8 @@
     "faker": "^3.0.1",
     "fixed-data-table": "^0.6.0",
     "google-libphonenumber": "^1.0.14",
-    "graphql": "^0.4.2",
-    "graphql-relay": "^0.3.5",
+    "graphql": "^0.4.18",
+    "graphql-relay": "^0.3.6",
     "handlebars": "^3.0.0",
     "history": "^1.13.1",
     "html-to-text": "^1.5.1",
@@ -91,7 +91,7 @@
     "react-link": "^1.0.3",
     "react-quill": "^0.3.0",
     "react-redux": "^4.4.1",
-    "react-relay": "^0.4.0",
+    "react-relay": "^0.7.3",
     "react-router": "^1.0.2",
     "react-router-relay": "^0.7.0",
     "react-select": "^1.0.0-beta8",
@@ -121,6 +121,6 @@
     "eslint-plugin-react": "latest",
     "foreman": "latest",
     "nodemon": "latest",
-    "webpack-dev-server": "1.10.1"
+    "webpack-dev-server": "^1.14.1"
   }
 }

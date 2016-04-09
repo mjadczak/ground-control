@@ -12,7 +12,7 @@ StartDateCell.propTypes = {
 
 export default Relay.createContainer(StartDateCell, {
   fragments: {
-    event: Relay.QL`
+    event: () => Relay.QL`
       fragment on Event {
         startDate
         localUTCOffset

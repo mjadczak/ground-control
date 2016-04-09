@@ -6,14 +6,23 @@ import EventsTable from './admin/events/EventsTable'
 import {Provider} from 'react-redux';
 import store from '../redux/store'
 
-const AdminEventsSection = () =>
+const AdminEventsSection = ({listContainer}) =>
   <Provider store={store}>
-    <EventsToolbar />
-    <EventsTable />
+    <div>
+      <EventsToolbar />
+      <EventsTable events={listContainer.events} />
+    </div>
   </Provider>
 
 export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: store.getState().admin.events.eventsQuery,
+  initialVariables: {
+    numEvents: 100,
+    sortField: 'startDate',
+    sortDirection: 'ASC',
+    status: 'PENDING_REVIEW',
+    filters: {},
+    hostFilters: {}
+  },
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {

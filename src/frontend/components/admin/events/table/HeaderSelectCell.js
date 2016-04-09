@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import HeaderCell from './HeaderCell'
 import {Checkbox} from 'material-ui'
 import {connect} from 'react-redux'
+import {FontIcon} from 'material-ui'
 import {BernieText, BernieColors} from '../../../styles/bernie-css'
 import {selectEvents, deselectAllEvents} from '../../../../redux/admin/events/actions'
 import Relay from 'react-relay'
@@ -49,13 +50,13 @@ HeaderSelectCell.propTypes = {
 
 const mapStoreToProps = (store, ownProps) => ({
   areSomeChecked: !store.admin.events.selectedEvents.isEmpty(),
-  areAllChecked: store.admin.events.selectedEvents.size === ownProps.events.length
+  areAllChecked: store.admin.events.selectedEvents.size === ownProps.events.edges.length
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   selectAllEvents: (events) => (
     () => dispatch(selectEvents(events))
-  )(ownProps.events.map((event) => event.id)), //only run the map once
+  )(ownProps.events.edges.map((event) => event.node.id)), //only run the map once
   deselectAllEvents: () => dispatch(deselectAllEvents())
 })
 
@@ -64,7 +65,7 @@ let connectedHeaderSelectCell = connect(mapStoreToProps, mapDispatchToProps)(Hea
 //This is one level up so that the verification warning is thrown before we try to compute the descendant props using
 // this one
 connectedHeaderSelectCell.propTypes = {
-  events: React.PropTypes.array.isRequired
+  events: React.PropTypes.object.isRequired
 }
 
 export default Relay.createContainer(connectedHeaderSelectCell, {

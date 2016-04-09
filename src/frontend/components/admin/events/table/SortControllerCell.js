@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import HeaderCell from './HeaderCell'
 import {changeQuery} from '../../../../redux/admin/events/actions'
 import {connect} from 'react-redux'
+import {FontIcon} from 'material-ui'
 
 const SortControllerCell = ({children, isSelected, sortDir = '', setSortBy, attribute, ...props}) =>
   <HeaderCell {...props}
@@ -29,7 +30,7 @@ const SortControllerCell = ({children, isSelected, sortDir = '', setSortBy, attr
 SortControllerCell.propTypes = {
   isSelected: React.PropTypes.bool.isRequired,
   sortDir: React.PropTypes.string,
-  toggleSort: React.PropTypes.func.isRequired
+  setSortBy: React.PropTypes.func.isRequired
 }
 
 const mapStoreToProps = (store, ownProps) => {

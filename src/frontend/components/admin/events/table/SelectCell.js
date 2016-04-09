@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import BodyCell from './BodyCell'
+import {Checkbox} from 'material-ui'
 import {connect} from 'react-redux'
 import {selectEvents, deselectEvents} from '../../../../redux/admin/events/actions'
 import Relay from 'react-relay'

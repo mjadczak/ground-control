@@ -1,23 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {BernieText, BernieColors} from '../../styles/bernie-css'
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
-  ToolbarTitle,
-  SelectField,
-  DropDownMenu,
-  Dialog,
-  Tabs,
-  Tab,
-  FlatButton,
-  RaisedButton,
-  IconButton,
-  FontIcon,
-  Checkbox,
-  TextField
-} from 'material-ui'
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import WindowSizeProvider from '../../helpers/WindowSizeProvider'
 import HeaderCell from './table/HeaderCell'
@@ -31,7 +13,7 @@ import CreateDateCell from './table/CreateDateCell'
 import * as TC from './table/TextCells'
 import Relay from 'react-relay'
 
-const EventsTable = ({events}, {windowWidth, windowHeight}) => {
+const EventsTable = ({events, ...props}, {windowWidth, windowHeight}) => {
   //Styling
   const tableStyle = {
     rowHeight: 83,
@@ -63,12 +45,12 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
 
   //Helpers
   const cellFunc = (Component, props = {}) => (
-    (rowIndex, width, height) => <Component event={events[rowIndex]} {...{width, height, ...props}} />
+    ({rowIndex, width, height}) => <Component event={events.edges[rowIndex].node} {...{width, height, ...props}} />
   )
 
   return <Table
     {...tableStyle}
-    rowsCount={events.length}
+    rowsCount={events.edges.length}
     width={windowWidth}
     height={windowHeight - 112} //TODO: get this from an export in the toolbar/admin/section component itself?
     //onRowDoubleClick={this._handleRowClick} //TODO
@@ -81,14 +63,16 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
         cell={cellFunc(SelectCell)}
         fixed={true}
         width={miscStyles.selectCellWidth}
-      />
-      /*<Column //TODO
+
+        /*<Column //TODO
         header={<HeaderCell>Manage</HeaderCell>}
         cell={<this.ActionCell data={events} col="actions" />}
         fixed={true}
         width={approvalFilterOptions[this.props.relay.variables.status].actions.length * 48 + 16}
         align='center'
       />*/
+      />
+
     </ColumnGroup>
     <ColumnGroup
       header={<HeaderCell>Event</HeaderCell>}
@@ -243,12 +227,6 @@ const EventsTableWrapped = (props) =>
     <EventsTable {...props} />
   </WindowSizeProvider>
 
-const tcFragments = TC.keys().map(cell => TC[cell].getFragment('event'))
-let tcNewlines = new Array(tcFragments.length - 1).fill('\n')
-tcNewlines.unshift('fragment on Event { \n')
-tcNewlines.push('\n}')
-const combinedTCFragment = Relay.QL(tcNewlines, ...tcFragments)
-
 export default Relay.createContainer(EventsTableWrapped, {
   fragments: {
     events: () => Relay.QL`
@@ -262,7 +240,7 @@ export default Relay.createContainer(EventsTableWrapped, {
             ${EventTypeCell.getFragment('event')}
             ${StartDateCell.getFragment('event')}
             ${CreateDateCell.getFragment('event')}
-            ${combinedTCFragment}
+            ${Object.keys(TC).map(compName => TC[compName].getFragment('event'))}
           }
         }
       }

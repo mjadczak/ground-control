@@ -12,7 +12,7 @@ CreateDateCell.propTypes = {
 
 export default Relay.createContainer(CreateDateCell, {
   fragments: {
-    event: Relay.QL`
+    event: () => Relay.QL`
       fragment on Event {
         createDate
       }

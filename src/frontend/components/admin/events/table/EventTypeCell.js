@@ -14,7 +14,7 @@ EventTypeCell.propTypes = {
 
 export default Relay.createContainer(EventTypeCell, {
   fragments: {
-    event: Relay.QL`
+    event: () => Relay.QL`
       fragment on Event {
         eventType {
           name
