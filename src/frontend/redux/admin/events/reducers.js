@@ -54,7 +54,7 @@ const DialogsRecord = Immutable.Record({
 
 export const visibleDialogs = createReducer(new DialogsRecord(), {
   [actions.SHOW_DIALOG]: (visibleDialogs, action) => visibleDialogs.set(action.dialogName, true),
-  [actions.DELETE_SELECTED_EVENTS]: (visibleDialogs, action) => visibleDialogs.set("deleteEvent", true)
+  [actions.DELETE_EVENTS]: (visibleDialogs, action) => visibleDialogs.set("deleteEvent", true)
 })
 //</editor-fold>
 
@@ -63,7 +63,8 @@ export const visibleDialogs = createReducer(new DialogsRecord(), {
 
 //this contains only the ids of the records - the record data should be read from Relay where necessary
 export const selectedEvents = createReducer(new Immutable.Set(), {
-  [actions.SELECT_EVENT]: (selectedEvents, action) => selectedEvents.add(action.eventID),
-  [actions.DESELECT_EVENT]: (selectedEvents, action) => selectedEvents.remove(action.eventID)
+  [actions.SELECT_EVENTS]: (selectedEvents, action) => selectedEvents.union(action.eventIDs),
+  [actions.DESELECT_EVENTS]: (selectedEvents, action) => selectedEvents.subtract(action.eventIDs),
+  [actions.DESELECT_ALL_EVENTS]: (selectedEvents, action) => new Immutable.Set()
 })
 //</editor-fold>

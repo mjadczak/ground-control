@@ -48,20 +48,28 @@ export function unapproveEvents(eventIDs) {
   }
 }
 
-export const SELECT_EVENT = Symbol('SELECT_EVENT')
+export const SELECT_EVENTS = mkSymbol('SELECT_EVENTS')
 
-export function selectEvent(eventID) {
+export function selectEvents(eventIDs) {
   return {
-    type: SELECT_EVENT,
-    eventID
+    type: SELECT_EVENTS,
+    eventIDs
   }
 }
 
-export const DESELECT_EVENT = mkSymbol('DESELECT_EVENT')
+export const DESELECT_EVENTS = mkSymbol('DESELECT_EVENTS')
 
-export function deselectEvent(eventID) {
+export function deselectEvents(eventIDs) {
   return {
-    type: DESELECT_EVENT,
-    eventID
+    type: DESELECT_EVENTS,
+    eventIDs
+  }
+}
+
+export const DESELECT_ALL_EVENTS = mkSymbol('DESELECT_ALL_EVENTS')
+
+export function deselectAllEvents() {
+  return {
+    type: DESELECT_ALL_EVENTS
   }
 }
