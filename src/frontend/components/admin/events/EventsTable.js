@@ -22,6 +22,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import WindowSizeProvider from '../../helpers/WindowSizeProvider'
 import HeaderCell from './table/HeaderCell'
 import HeaderSelectCell from './table/HeaderSelectCell'
+import SortControllerCell from './table/SortControllerCell'
 import SelectCell from './table/SelectCell'
 import EventIDLinkCell from './table/EventIDLinkCell'
 import Relay from 'react-relay'
@@ -40,7 +41,7 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
 
   //Helpers
   const cellFunc = (Component) => (
-    (rowIndex, width, height) =>  <Component event={events[rowIndex]} {...{width, height}} />
+    (rowIndex, width, height) => <Component event={events[rowIndex]} {...{width, height}} />
   )
 
   return <Table
@@ -79,7 +80,7 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       />
       <Column
         flexGrow={1}
-        header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
+        header={<SortControllerCell attribute="eventTypeId">Type</SortControllerCell>}
         cell={
               <this.EventTypeCell data={events} col="eventType" attr="name" />
             }
@@ -89,13 +90,13 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
     <ColumnGroup
       header={<HeaderCell>Time</HeaderCell>}>
       <Column
-        header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
+        header={<SortControllerCell attribute="startDate">Event Date</SortControllerCell>}
         cell={<this.DateCell data={events} col="startDate" />}
         flexGrow={1}
         width={170}
       />
       <Column
-        header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
+        header={<SortControllerCell attribute="createDate">Create Date</SortControllerCell>}
         cell={<this.DateCell data={events} col="createDate" />}
         flexGrow={1}
         width={170}
@@ -105,13 +106,13 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       header={<HeaderCell>About</HeaderCell>}>
       <Column
         flexGrow={1}
-        header={<this.SortControllerCell content="Event Name" attribute="name" />}
+        header={<SortControllerCell attribute="name">Event Name</SortControllerCell>}
         cell={<this.TextCell data={events} col="name" />}
         width={250}
       />
       <Column
         flexGrow={1}
-        header={<this.SortControllerCell content="Description" attribute="description" />}
+        header={<SortControllerCell attribute="description">Description</SortControllerCell>}
         cell={<this.NoHTMLCell data={events} col="description" />}
         width={450}
       />
@@ -132,7 +133,7 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
       />
       <Column
         flexGrow={1}
-        header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
+        header={<SortControllerCell attribute="contactPhone">Phone</SortControllerCell>}
         cell={<this.TextCell data={events} col="contactPhone" />}
         width={100}
       />
@@ -140,14 +141,14 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
     <ColumnGroup
       header={<HeaderCell >Detailed Info</HeaderCell>}>
       <Column
-        header={<this.SortControllerCell content="Duration" attribute="duration" />}
+        header={<SortControllerCell attribute="duration">Duration</SortControllerCell>}
         cell={<this.DurationCell data={events} col="duration" />}
         flexGrow={1}
         width={110}
       />
       <Column
         flexGrow={1}
-        header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
+        header={<SortControllerCell attribute="capacity">Capacity</SortControllerCell>}
         cell={<this.TextCell data={events} col="capacity" />}
         width={100}
         align='center'
@@ -163,46 +164,46 @@ const EventsTable = ({events}, {windowWidth, windowHeight}) => {
     <ColumnGroup
       header={<HeaderCell>Event Location</HeaderCell>}>
       <Column
-        header={<this.SortControllerCell content="Venue" attribute="venueName" />}
+        header={<SortControllerCell attribute="venueName">Venue</SortControllerCell>}
         cell={<this.TextCell data={events} col="venueName" />}
         flexGrow={1}
         width={150}
       />
       <Column
-        header={<this.SortControllerCell content="Address" attribute="venueAddr1" />}
+        header={<SortControllerCell attribute="venueAddr1">Address</SortControllerCell>}
         cell={<this.TextCell data={events} col="venueAddr1" />}
         flexGrow={1}
         width={150}
       />
       <Column
-        header={<this.SortControllerCell content="City" attribute="venueCity" />}
+        header={<SortControllerCell attribute="venueCity">City</SortControllerCell>}
         cell={<this.TextCell data={events} col="venueCity" />}
         flexGrow={1}
         width={150}
       />
       <Column
-        header={<this.SortControllerCell content="State" attribute="venueState" />}
+        header={<SortControllerCell attribute="venueState">State</SortControllerCell>}
         cell={<this.TextCell data={events} col="venueState" />}
         flexGrow={1}
         width={80}
         align='center'
       />
       <Column
-        header={<this.SortControllerCell content="Zip Code" attribute="venueZip" />}
+        header={<SortControllerCell attribute="venueZip">Zip Code</SortControllerCell>}
         cell={<this.TextCell data={events} col="venueZip" />}
         flexGrow={1}
         width={120}
         align='center'
       />
       <Column
-        header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
+        header={<SortControllerCell attribute="latitude">Latitude</SortControllerCell>}
         cell={<this.TextCell data={events} col="latitude" />}
         flexGrow={1}
         width={150}
         align='center'
       />
       <Column
-        header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
+        header={<SortControllerCell attribute="longitude">Longitude</SortControllerCell>}
         cell={<this.TextCell data={events} col="longitude" />}
         flexGrow={1}
         width={150}

@@ -65,6 +65,7 @@ export const visibleDialogs = createReducer(new DialogsRecord(), {
 export const selectedEvents = createReducer(new Immutable.Set(), {
   [actions.SELECT_EVENTS]: (selectedEvents, action) => selectedEvents.union(action.eventIDs),
   [actions.DESELECT_EVENTS]: (selectedEvents, action) => selectedEvents.subtract(action.eventIDs),
-  [actions.DESELECT_ALL_EVENTS]: (selectedEvents, action) => new Immutable.Set()
+  [actions.DESELECT_ALL_EVENTS]: (selectedEvents, action) => new Immutable.Set(),
+  [actions.CHANGE_QUERY]: (selectedEvents, action) => new Immutable.Set()
 })
 //</editor-fold>

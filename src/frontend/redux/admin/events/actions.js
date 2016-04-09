@@ -1,7 +1,7 @@
 //Actions for the AdminEventsSection
 
 const actionPrefix = 'ADMIN/EVENTS/'
-const mkSymbol = (name) => Symbol(actionPrefix + name)
+const mkSymbol     = (name) => Symbol(actionPrefix + name)
 
 export const CHANGE_QUERY = mkSymbol('CHANGE_QUERY')
 
