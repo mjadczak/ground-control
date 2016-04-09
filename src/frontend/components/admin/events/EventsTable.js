@@ -249,7 +249,7 @@ tcNewlines.unshift('fragment on Event { \n')
 tcNewlines.push('\n}')
 const combinedTCFragment = Relay.QL(tcNewlines, ...tcFragments)
 
-const relayConnectedEventsTableWrapped = Relay.createContainer(EventsTableWrapped, {
+export default Relay.createContainer(EventsTableWrapped, {
   fragments: {
     events: () => Relay.QL`
       fragment on EventConnection {

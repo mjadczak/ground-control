@@ -11,7 +11,12 @@ const SelectCell = ({isSelected, selectEvent, deselectEvent, ...props}) =>
       name="_events-cb"
       value=""
       checked={isSelected}
-      onCheck={() => { if (isSelected) deselectEvent() else selectEvent() }}
+      onCheck={() => {
+        if (isSelected)
+          deselectEvent()
+        else
+          selectEvent()
+      }}
       style={{marginLeft: '15px'}}
     />
   </BodyCell>
