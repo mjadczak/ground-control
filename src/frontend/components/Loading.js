@@ -9,12 +9,15 @@ import {CircularProgress} from 'material-ui';
 export default class Loading extends React.Component {
   render() {
     return (
-      <div style={{
-        paddingTop: 50,
-        margin: '0 auto'
+
+        <div style={{
+        margin: '0 auto',
+        width: 150,
+        height: 150,
       }}>
-        <CircularProgress mode="indeterminate" size={2}/>
-      </div>
+          <CircularProgress mode="indeterminate" size={2}/>
+        </div>
+
     )
   }
 }

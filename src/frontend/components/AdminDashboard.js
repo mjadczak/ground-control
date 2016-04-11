@@ -5,6 +5,8 @@ import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
 import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
+import {Provider} from 'react-redux';
+import store from '../redux/store'
 
 class AdminDashboard extends React.Component {
   tabs = [
@@ -39,7 +41,9 @@ class AdminDashboard extends React.Component {
             history={this.props.history}
             location={this.props.location}
           />
-          {this.props.children}
+          <Provider store={store}>
+            {this.props.children}
+          </Provider>
         </div>
       </MuiThemeProvider>
     )

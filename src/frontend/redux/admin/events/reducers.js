@@ -8,7 +8,7 @@ import * as actions from './actions'
 //<editor-fold desc="Events Query">
 //Events query state
 const getEventsQueryFromHash = () => {
-  let parsed = JSURL.parse(location.hash)
+  let parsed = JSURL.parse(decodeURIComponent(location.hash.substr(1))) //because turns out quotes ARE encoded by browsers, JSURL devs!
   if (!parsed) return {}
   if (!parsed.admin) return {}
   if (!parsed.admin.events) return {}
