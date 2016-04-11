@@ -18,7 +18,7 @@ const DateCell = ({utcOffset = 0, timezone = 'UTC', date, ...props}) => {
 DateCell.propTypes = {
   utcOffset: React.PropTypes.number,
   timezone: React.PropTypes.string,
-  date: React.PropTypes.string.required
+  date: React.PropTypes.string.isRequired
 }
 
 export default DateCell

@@ -12,10 +12,10 @@ const HeaderSelectCell = ({areSomeChecked, areAllChecked, handleMasterChecked, s
   <HeaderCell {...props}>
     <Checkbox
       checked={areSomeChecked}
-      onCheck={(event, currentlyChecked) => {
+      onCheck={(event, checked) => {
         //see https://html.spec.whatwg.org/multipage/forms.html#checkbox-state-(type=checkbox)
 
-        if (!currentlyChecked) {
+        if (!areSomeChecked) {
           //None selected, so select all
           selectAllEvents()
           return
@@ -53,12 +53,13 @@ const mapStoreToProps = (store, ownProps) => ({
   areAllChecked: store.admin.events.selectedEvents.size === ownProps.events.edges.length
 })
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  selectAllEvents: (events) => (
-    () => dispatch(selectEvents(events))
-  )(ownProps.events.edges.map((event) => event.node.id)), //only run the map once
-  deselectAllEvents: () => dispatch(deselectAllEvents())
-})
+const mapDispatchToProps = (dispatch, ownProps) => {
+  let eventIDs = ownProps.events.edges.map((event) => event.node.id)
+  return {
+    selectAllEvents: () => dispatch(selectEvents(eventIDs)),
+    deselectAllEvents: () => dispatch(deselectAllEvents())
+  }
+}
 
 let connectedHeaderSelectCell = connect(mapStoreToProps, mapDispatchToProps)(HeaderSelectCell)
 
