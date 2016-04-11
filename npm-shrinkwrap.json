@@ -1408,9 +1408,9 @@
       }
     },
     "express-graphql": {
-      "version": "0.3.0",
-      "from": "express-graphql@>=0.3.0 <0.4.0",
-      "resolved": "https://registry.npmjs.org/express-graphql/-/express-graphql-0.3.0.tgz"
+      "version": "0.4.13",
+      "from": "express-graphql@>=0.4.13 <0.5.0",
+      "resolved": "https://registry.npmjs.org/express-graphql/-/express-graphql-0.4.13.tgz"
     },
     "express-history-api-fallback": {
       "version": "2.0.0",
@@ -4174,9 +4174,9 @@
       "resolved": "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz"
     },
     "punycode": {
-      "version": "1.4.0",
+      "version": "1.4.1",
       "from": "punycode@>=1.2.4 <2.0.0",
-      "resolved": "https://registry.npmjs.org/punycode/-/punycode-1.4.0.tgz"
+      "resolved": "https://registry.npmjs.org/punycode/-/punycode-1.4.1.tgz"
     },
     "q": {
       "version": "1.4.1",

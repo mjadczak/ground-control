@@ -333,13 +333,16 @@ function startApp() {
   app.use(passport.initialize())
   app.use(passport.session())
   app.use('/graphql', graphQLHTTP((request) => {
-    return {
+    let params = {
       rootValue: {
         user: request.user,
         loaders: createLoaders()
       },
       schema: Schema
     }
+    if (process.env.NODE_ENV === 'development')
+      params.igraphql = true
+    return params
   }))
 
   app.get('/slack/callforbernie/', async (req, res) => {
