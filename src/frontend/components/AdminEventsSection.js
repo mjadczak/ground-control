@@ -5,13 +5,13 @@ import EventsToolbar from './admin/events/EventsToolbar'
 import EventsTable from './admin/events/EventsTable'
 import {connect} from 'react-redux';
 import Loading from './Loading'
+import globalStore from '../redux/store'
 
 class AdminEventsSection extends React.Component {
   constructor(props, ctx) {
     super(props, ctx)
-    props.relay.setVariables(props.query || {})
     this.state = {
-      loading: false
+      loading: !props.listContainer.events
     }
   }
 
@@ -25,7 +25,9 @@ class AdminEventsSection extends React.Component {
       }
     </div>
 
-  onReadyStateChange = ({done}) => this.setState({loading: !done})
+  onReadyStateChange = ({done, ...rest}) => {
+    this.setState({loading: !done})
+  }
 
   componentWillReceiveProps = ({query}) => {
     if (query !== this.props.query) {
@@ -34,15 +36,12 @@ class AdminEventsSection extends React.Component {
   }
 }
 
+const mapStoreToProps = (store) => ({
+  query: store.admin.events.eventsQuery
+})
+
 let relayAdminEventsSection = Relay.createContainer(AdminEventsSection, {
-  initialVariables: {
-    numEvents: 100,
-    sortField: 'startDate',
-    sortDirection: 'ASC',
-    status: 'PENDING_REVIEW',
-    filters: {},
-    hostFilters: {}
-  },
+  initialVariables: mapStoreToProps(globalStore.getState()).query.toJS(), //Small hack to get the initial variables to work
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
@@ -59,10 +58,6 @@ let relayAdminEventsSection = Relay.createContainer(AdminEventsSection, {
       }
     `
   }
-})
-
-const mapStoreToProps = (store) => ({
-  query: store.admin.events.eventsQuery
 })
 
 export default connect(mapStoreToProps)(relayAdminEventsSection)
