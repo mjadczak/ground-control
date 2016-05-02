@@ -99,6 +99,7 @@
     "react-widgets": "^3.2.0",
     "redux": "^3.3.1",
     "redux-immutablejs": "0.0.8",
+    "redux-ui": "0.0.14",
     "relay": "^0.8.0",
     "request-promise": "^2.0.0",
     "retry": "^0.8.0",

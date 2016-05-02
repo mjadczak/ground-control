@@ -6,6 +6,7 @@ import EventsTable from './admin/events/EventsTable'
 import {connect} from 'react-redux';
 import Loading from './Loading'
 import globalStore from '../redux/store'
+import * as accessors from '../redux/admin/events/accessors'
 
 class AdminEventsSection extends React.Component {
   constructor(props, ctx) {
@@ -21,7 +22,7 @@ class AdminEventsSection extends React.Component {
       {
         this.state.loading
           ? <Loading />
-          : <EventsTable events={this.props.listContainer.events}/>
+          : <EventsTable events={this.props.listContainer.events} currentUser={this.props.currentUser} />
       }
     </div>
 
@@ -31,7 +32,7 @@ class AdminEventsSection extends React.Component {
 
   componentWillReceiveProps = ({query}) => {
     if (query !== this.props.query) {
-      this.props.relay.setVariables(query.toJS(), this.onReadyStateChange)
+      this.props.relay.setVariables(accessors.getQueryVariablesFromQuery(query), this.onReadyStateChange)
     }
   }
 }
@@ -41,8 +42,14 @@ const mapStoreToProps = (store) => ({
 })
 
 let relayAdminEventsSection = Relay.createContainer(AdminEventsSection, {
-  initialVariables: mapStoreToProps(globalStore.getState()).query.toJS(), //Small hack to get the initial variables to work
+  //Small hack to get the initial variables to work
+  initialVariables: accessors.getQueryVariablesFromQuery(mapStoreToProps(globalStore.getState()).query),
   fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        ${EventsTable.getFragment('currentUser')}
+      }
+    `,
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         events(

@@ -22,8 +22,7 @@ const EventsQueryRecord = Immutable.Record({
   sortField: 'startDate',
   sortDirection: 'ASC',
   status: 'PENDING_REVIEW',
-  filters: {}, //todo: use a record
-  hostFilters: {} //todo: ditto
+  filters: new Immutable.List()
 }, 'EventsQueryRecord')
 
 export const eventsQuery = createReducer(new EventsQueryRecord(getEventsQueryFromHash()), {

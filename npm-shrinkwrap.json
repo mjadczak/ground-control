@@ -4389,8 +4389,8 @@
     },
     "react-relay": {
       "version": "0.7.3",
-      "from": "react-relay@latest",
-      "resolved": "https://registry.npmjs.org/react-relay/-/react-relay-0.7.3.tgz",
+      "from": "git://github.com/facebook/relay.git",
+      "resolved": "git://github.com/facebook/relay.git#bfb84bc5f2fc517d829737b6f2c9ba09474cdfc0",
       "dependencies": {
         "babel-runtime": {
           "version": "5.8.24",
@@ -4527,6 +4527,11 @@
       "version": "0.0.8",
       "from": "redux-immutablejs@latest",
       "resolved": "https://registry.npmjs.org/redux-immutablejs/-/redux-immutablejs-0.0.8.tgz"
+    },
+    "redux-ui": {
+      "version": "0.0.14",
+      "from": "redux-ui@latest",
+      "resolved": "https://registry.npmjs.org/redux-ui/-/redux-ui-0.0.14.tgz"
     },
     "regenerate": {
       "version": "1.2.1",

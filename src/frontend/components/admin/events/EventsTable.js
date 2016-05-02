@@ -7,13 +7,15 @@ import HeaderSelectCell from './table/HeaderSelectCell'
 import SortControllerCell from './table/SortControllerCell'
 import SelectCell from './table/SelectCell'
 import EventIDLinkCell from './table/EventIDLinkCell'
-import EventTypeCell from './table/EventTypeCell'
 import StartDateCell from './table/StartDateCell'
 import CreateDateCell from './table/CreateDateCell'
+import ActionCell from './table/ActionCell'
 import * as TC from './table/TextCells'
 import Relay from 'react-relay'
+import {connect} from 'react-redux'
+import {availableActions} from './eventsLogic'
 
-const EventsTable = ({events, ...props}, {windowWidth, windowHeight}) => {
+const EventsTable = ({events, currentUser, status, ...props}, {windowWidth, windowHeight}) => {
   //Styling
   const tableStyle = {
     rowHeight: 83,
@@ -63,16 +65,15 @@ const EventsTable = ({events, ...props}, {windowWidth, windowHeight}) => {
         cell={cellFunc(SelectCell)}
         fixed={true}
         width={miscStyles.selectCellWidth}
-
-        /*<Column //TODO
-        header={<HeaderCell>Manage</HeaderCell>}
-        cell={<this.ActionCell data={events} col="actions" />}
-        fixed={true}
-        width={approvalFilterOptions[this.props.relay.variables.status].actions.length * 48 + 16}
-        align='center'
-      />*/
       />
 
+      <Column
+        header={<HeaderCell>Manage</HeaderCell>}
+        cell={cellFunc(ActionCell, {currentUser})}
+        fixed={true}
+        width={availableActions({status, currentUser}).size * 48 + 18} //TODO: get rid of magic numbers?
+        align='center'
+      />
     </ColumnGroup>
     <ColumnGroup
       header={<HeaderCell>Event</HeaderCell>}
@@ -87,7 +88,7 @@ const EventsTable = ({events, ...props}, {windowWidth, windowHeight}) => {
       <Column
         flexGrow={1}
         header={<SortControllerCell attribute="eventTypeId">Type</SortControllerCell>}
-        cell={cellFunc(EventTypeCell)}
+        cell={cellFunc(TC.EventTypeCell)}
         width={miscStyles.typeCellWidth}
       />
     </ColumnGroup>
@@ -217,27 +218,37 @@ const EventsTable = ({events, ...props}, {windowWidth, windowHeight}) => {
   </Table>
 }
 
+const mapStoreToProps = (store) => ({
+  status: store.admin.events.eventsQuery.status
+})
+
 EventsTable.contextTypes = {
   windowWidth: React.PropTypes.number.isRequired,
   windowHeight: React.PropTypes.number.isRequired
 }
 
+const EventsTableConnected = connect(mapStoreToProps)(EventsTable)
+
 const EventsTableWrapped = (props) =>
   <WindowSizeProvider>
-    <EventsTable {...props} />
+    <EventsTableConnected {...props} />
   </WindowSizeProvider>
 
 export default Relay.createContainer(EventsTableWrapped, {
   fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        ${ActionCell.getFragment('currentUser')}
+      }
+    `,
     events: () => Relay.QL`
       fragment on EventConnection {
         ${HeaderSelectCell.getFragment('events')}
         edges {
           node {
             ${SelectCell.getFragment('event')}
-            #TODO ActionCell
+            ${ActionCell.getFragment('event')}
             ${EventIDLinkCell.getFragment('event')}
-            ${EventTypeCell.getFragment('event')}
             ${StartDateCell.getFragment('event')}
             ${CreateDateCell.getFragment('event')}
             ${Object.keys(TC).map(compName => TC[compName].getFragment('event'))}

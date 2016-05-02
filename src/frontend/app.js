@@ -157,7 +157,7 @@ ReactDOM.render(
         path='events'
         component={AdminEventsSection}
         queries={{
-          //...CurrentUserQueries,
+          ...CurrentUserQueries,
           ...ListContainerQueries
         }}
         renderLoading={() => <Loading />}

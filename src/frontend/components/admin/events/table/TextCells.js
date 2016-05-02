@@ -12,6 +12,18 @@ export const EventNameCell = makeTextCell({
   `
 })
 
+export const EventTypeCell = makeTextCell({
+  colName: 'eventType.name',
+  accessor: event => event.eventType.name,
+  relayFragment: Relay.QL`
+      fragment on Event {
+        eventType {
+          name
+        }
+      }
+    `
+})
+
 export const EventDescriptionCell = makeTextCell({
   colName: 'description',
   transformer: desc => desc.replace(/(<([^>]+)>)|\\n/ig, ""),

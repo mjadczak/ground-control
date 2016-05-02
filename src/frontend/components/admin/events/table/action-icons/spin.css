@@ -1,0 +1,19 @@
+/* Can't do these easily with inline styles */
+@-moz-keyframes admin_events_table_action-icons_FfwdIcon_spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes admin_events_table_action-icons_FfwdIcon_spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes admin_events_table_action-icons_FfwdIcon_spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+._admin_events_table_action-icons_FfwdIcon_spin {
+    -webkit-animation: spin 2s infinite linear;
+    -moz-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
